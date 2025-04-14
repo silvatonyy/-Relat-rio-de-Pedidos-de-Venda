@@ -1,0 +1,109 @@
+*&---------------------------------------------------------------------*
+*& Report  ZTSAR_SALES_ORDER_REPORT
+*&
+*&---------------------------------------------------------------------*
+*&
+*&
+*&---------------------------------------------------------------------*
+
+REPORT  ztsar_sales_order_report.
+
+TYPE-POOLS: slis.
+
+SELECTION-SCREEN BEGIN OF BLOCK 001 WITH FRAME TITLE text-001.
+PARAMETERS: p_date  TYPE sy-datum,
+            p_date2 TYPE sy-datum.
+SELECTION-SCREEN END OF BLOCK 001.
+
+TYPES: BEGIN OF y_vbak,
+ vbeln TYPE vbak-vbeln,
+ erdat TYPE vbak-erdat,
+ kunnr TYPE vbak-kunnr,
+  END OF y_vbak.
+
+DATA: t_vbak      TYPE TABLE OF y_vbak,
+      w_vbak      TYPE y_vbak,
+      it_fieldcat TYPE slis_t_fieldcat_alv.
+
+
+
+PERFORM select_main.
+PERFORM build_alv.
+PERFORM display_alv.
+
+
+*&---------------------------------------------------------------------*
+*&      Form  SELECT_MAIN
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM select_main .
+
+  SELECT vbeln erdat kunnr
+    FROM vbak
+    INTO TABLE t_vbak
+    WHERE erdat BETWEEN p_date AND p_date2.
+
+  IF t_vbak IS INITIAL.
+    MESSAGE 'Dados n o encontrados' TYPE 'E'.
+  ENDIF.
+
+
+ENDFORM.                    " SELECT_MAIN
+*&---------------------------------------------------------------------*
+*&      Form  DISPLAY_ALV
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+
+*----------------------------------------------------------------------*
+FORM build_alv .
+  DATA: ls_fieldcat TYPE slis_fieldcat_alv.
+
+  CLEAR ls_fieldcat.
+  ls_fieldcat-fieldname = 'VBELN'.
+  ls_fieldcat-seltext_m = 'Pedido de Venda'.
+  APPEND ls_fieldcat TO it_fieldcat.
+
+  CLEAR ls_fieldcat.
+  ls_fieldcat-fieldname = 'ERDAT'.
+  ls_fieldcat-seltext_m = 'Data de Cria  o'.
+  APPEND ls_fieldcat TO it_fieldcat.
+
+  CLEAR ls_fieldcat.
+  ls_fieldcat-fieldname = 'KUNNR'.
+  ls_fieldcat-seltext_m = 'Cliente'.
+  APPEND ls_fieldcat TO it_fieldcat.
+ENDFORM.                    " BUILD_ALV
+
+
+*&---------------------------------------------------------------------*
+*&      Form  BUILD_ALV
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+
+
+FORM display_alv .
+  CALL FUNCTION 'REUSE_ALV_GRID_DISPLAY'
+    EXPORTING
+      it_fieldcat   = it_fieldcat
+    TABLES
+      t_outtab      = t_vbak
+    EXCEPTIONS
+      program_error = 1
+      OTHERS        = 2.
+  IF sy-subrc <> 0.
+* MESSAGE ID SY-MSGID TYPE SY-MSGTY NUMBER SY-MSGNO
+*         WITH SY-MSGV1 SY-MSGV2 SY-MSGV3 SY-MSGV4.
+  ENDIF.
+
+ENDFORM.                    " DISPLAY_ALV
