@@ -7,4 +7,7 @@ Desenvolva  um relatório que ajude o time de vendas a monitorar os pedidos emit
 *Consultar a tabela VBAK
 *Listar os pedidos encontrados com suas datas e clientes
 
+Crie esse programa para mostrar alguns dados da tabela VBAK e no final mostrei esses dados um relatório ALV, esse programa é simples porém é bom para poder estar aplicando os conceitos de como criar uma instrutura interna, uso do SELECT, CRIAÇÃO DO ALV e chamado do ALV do tipo REUSE_ALV_GRID_DISPLAY.
+
+
 
